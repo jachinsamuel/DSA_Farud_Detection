@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Bank • Fraud &amp; AML Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="bank-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="20" height="14" x="2" y="5" rx="2"/>
+          <line x1="2" x2="22" y1="10" y2="10"/>
+        </svg>
+      </div>
+      <div class="brand-titles">
+        <span class="main-title">Apex Bank Fraud Guard</span>
+        <span class="sub-title">Manager Operations &amp; Anti-Money Laundering Portal</span>
+      </div>
+    </div>
+
+    <div class="nav-center-kpi">
+      <div class="kpi-pill">
+        <span class="pulse-green"></span>
+        <span class="kpi-text">Shield Active</span>
+      </div>
+      <div class="kpi-divider"></div>
+      <div class="kpi-stat">
+        <span class="stat-number" id="kpiAccounts">19</span>
+        <span class="stat-desc">Accounts</span>
+      </div>
+      <div class="kpi-divider"></div>
+      <div class="kpi-stat">
+        <span class="stat-number alert" id="kpiAlerts">3</span>
+        <span class="stat-desc">Incidents</span>
+      </div>
+    </div>
+
+    <div class="nav-tools">
+      <button id="btnResetView" class="btn btn-secondary">Center Map</button>
+      <button id="btnThemeToggle" class="btn btn-secondary">Dark Mode</button>
+    </div>
+  </header>
+
+  <div class="dashboard-body">
+    
+    <div class="map-container">
+      <div class="map-window-header">
+        <div class="category-tabs-scroll">
+          <button class="cat-tab-btn active" data-cat="all">All Accounts (19)</button>
+          <button class="cat-tab-btn" data-cat="retail">1. Everyday Retail (4)</button>
+          <button class="cat-tab-btn" data-cat="rings">2. Laundering Rings (4)</button>
+          <button class="cat-tab-btn" data-cat="mules">3. Mule Pipelines (4)</button>
+          <button class="cat-tab-btn" data-cat="smurfing">4. Split Transfers (6)</button>
+          <button class="cat-tab-btn" data-cat="offshore">5. Offshore Funnels (5)</button>
+          <button class="cat-tab-btn" data-cat="watchlist">6. Watchlist Entities (8)</button>
+        </div>
+        <div class="toolbar-actions">
+          <button id="btnZoomIn" class="btn-icon" title="Zoom In">+</button>
+          <button id="btnZoomOut" class="btn-icon" title="Zoom Out">−</button>
+          <button id="btnFitMap" class="btn-icon" title="Fit Network">⛶</button>
+        </div>
+      </div>
+
+      <div class="canvas-holder">
+        <canvas id="graphCanvas"></canvas>
+      </div>
+
+      <div class="map-legend">
+        <span class="legend-chip"><span class="badge-dot green"></span> Verified Account</span>
+        <span class="legend-chip"><span class="badge-dot amber"></span> Watchlist Account</span>
+        <span class="legend-chip"><span class="badge-dot red"></span> High-Risk / Blacklisted</span>
+        <span class="legend-chip"><span class="badge-line red"></span> Circular Laundering</span>
+        <span class="legend-chip"><span class="badge-line blue"></span> Middleman Route</span>
+      </div>
+    </div>
+
+    <div class="panel-resizer" id="panelResizer" title="Drag left/right to resize panel (Double-click to toggle width)">
+      <div class="resizer-grip"></div>
+    </div>
+
+    <aside class="control-panel" id="controlPanel">
+      
+      <div class="panel-top-bar">
+        <div class="manager-tabs">
+          <button id="tabBtnAlerts" class="tab-btn active" data-tab="tabAlerts">
+            <span>Priority Incidents</span>
+            <span class="tab-badge red" id="tabAlertsCount">3</span>
+          </button>
+          <button id="tabBtnDossier" class="tab-btn" data-tab="tabDossier">
+            <span>Customer Dossier</span>
+          </button>
+          <button id="tabBtnTransfer" class="tab-btn" data-tab="tabTransfer">
+            <span>New Transfer</span>
+          </button>
+        </div>
+
+        <div class="panel-size-switcher" title="Adjust panel size">
+          <button class="btn-size" data-size="compact" title="Compact Panel (300px)">S</button>
+          <button class="btn-size active" data-size="normal" title="Normal Panel (420px)">M</button>
+          <button class="btn-size" data-size="wide" title="Enlarged Panel (600px)">L</button>
+        </div>
+      </div>
+
+      <div id="tabAlerts" class="tab-content active">
+        <div class="section-header">
+          <div>
+            <h3 class="section-title">Flagged Incident Queue</h3>
+            <p class="section-desc">Active patterns requiring managerial review and authorization.</p>
+          </div>
+          <button id="btnRefreshIncidents" class="btn-sm btn-secondary" title="Re-scan system">Refresh</button>
+        </div>
+
+        <div class="incidents-list">
+          
+          <div class="incident-card red">
+            <div class="incident-top">
+              <span class="incident-badge red">Critical Warning</span>
+              <span class="incident-time">Detected Real-Time</span>
+            </div>
+            <h4 class="incident-heading">Circular Money Laundering Ring</h4>
+            <p class="incident-details">
+              $374,500 transferred through 4 shell companies returning to the source account to mask fund origins.
+            </p>
+            <div class="incident-flow">ACC-101 ➔ ACC-102 ➔ ACC-103 ➔ ACC-104</div>
+            <div class="incident-actions">
+              <button id="btnInspectCycle" class="btn btn-primary red btn-sm">Inspect on Network Map</button>
+            </div>
+          </div>
+
+          <div class="incident-card blue">
+            <div class="incident-top">
+              <span class="incident-badge blue">Mule Relay Route</span>
+              <span class="incident-time">Cross-Border Alert</span>
+            </div>
+            <h4 class="incident-heading">Blacklisted Cash-Out Route</h4>
+            <p class="incident-details">
+              $250,000 relayed from Sanctioned ACC-901 through 2 intermediary accounts to Cash-Out Terminal ACC-999.
+            </p>
+            <div class="incident-flow">ACC-901 ➔ ACC-902 ➔ ACC-903 ➔ ACC-999</div>
+            <div class="incident-actions">
+              <button id="btnInspectPath" class="btn btn-primary blue btn-sm">Trace Transfer Path</button>
+            </div>
+          </div>
+
+          <div class="incident-card amber">
+            <div class="incident-top">
+              <span class="incident-badge amber">High Activity</span>
+              <span class="incident-time">Threshold Evaded</span>
+            </div>
+            <h4 class="incident-heading">Split Transfer (Smurfing) Scheme</h4>
+            <p class="incident-details">
+              Central Hub ACC-200 dispersing 5 separate transfers under the $10,000 regulatory reporting threshold.
+            </p>
+            <div class="incident-flow">ACC-200 ➔ 5 Mule Accounts ➔ Offshore ACC-300</div>
+            <div class="incident-actions">
+              <button id="btnInspectSmurfing" class="btn btn-primary amber btn-sm">Highlight Syndicate</button>
+            </div>
+          </div>
+
+          <div class="incident-card amber">
+            <div class="incident-top">
+              <span class="incident-badge amber">Offshore Funnel</span>
+              <span class="incident-time">Cross-Border Sink</span>
+            </div>
+            <h4 class="incident-heading">Offshore Tax-Haven Consolidation</h4>
+            <p class="incident-details">
+              4 smurf mules (ACC-201 to ACC-204) funneling $38,200 of structured funds into Cayman Offshore account ACC-300.
+            </p>
+            <div class="incident-flow">Mules (ACC-201..204) ➔ Offshore Funnel ACC-300</div>
+            <div class="incident-actions">
+              <button id="btnInspectOffshore" class="btn btn-primary amber btn-sm">Inspect Offshore Funnel</button>
+            </div>
+          </div>
+
+          <div class="incident-card red">
+            <div class="incident-top">
+              <span class="incident-badge red">Sanctions Alert</span>
+              <span class="incident-time">OFAC Watchlist</span>
+            </div>
+            <h4 class="incident-heading">Sanctioned Entity High-Value Outflow</h4>
+            <p class="incident-details">
+              Blacklisted entity ACC-901 (Risk Rating: 99%) attempted wire transfers exceeding $250,000 to intermediary accounts.
+            </p>
+            <div class="incident-flow">ACC-901 (Blacklisted) ➔ ACC-902 (Mule)</div>
+            <div class="incident-actions">
+              <button id="btnInspectSanctioned" class="btn btn-primary red btn-sm">Inspect Sanctioned Profile</button>
+            </div>
+          </div>
+
+          <div class="incident-card red">
+            <div class="incident-top">
+              <span class="incident-badge red">Terminal Alert</span>
+              <span class="incident-time">Cash-Out Endpoint</span>
+            </div>
+            <h4 class="incident-heading">Dark Cash-Out Terminal Liquidation</h4>
+            <p class="incident-details">
+              Cash-out terminal ACC-999 has accumulated $2,300,000 with multiple high-risk inbound flows from relay intermediaries.
+            </p>
+            <div class="incident-flow">ACC-903 ➔ ACC-999 (Cash-Out Terminal)</div>
+            <div class="incident-actions">
+              <button id="btnInspectTerminal" class="btn btn-primary red btn-sm">Inspect Terminal Account</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="tabDossier" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h3 class="section-title">Customer Dossier</h3>
+            <p class="section-desc">Select an account from the map or dropdown to review profile and risk score.</p>
+          </div>
+        </div>
+
+        <div class="quick-account-selector">
+          <label>Quick Account Search</label>
+          <select id="selectDossierAccount" class="input-select"></select>
+        </div>
+
+        <div id="dossierPlaceholder" class="dossier-empty">
+          <div class="empty-icon">👤</div>
+          <p>Click any customer on the network map or select one above to inspect their profile.</p>
+        </div>
+
+        <div id="dossierCard" class="dossier-card hidden">
+          <div class="dossier-top">
+            <div class="dossier-avatar" id="dossierAvatar">🏢</div>
+            <div class="dossier-main">
+              <div class="dossier-name" id="dossierName">Vanguard Shell Corp</div>
+              <div class="dossier-id" id="dossierId">ACC-101</div>
+            </div>
+            <span class="risk-pill" id="dossierRiskPill">High Risk</span>
+          </div>
+
+          <div class="dossier-stats-grid">
+            <div class="dossier-stat-box">
+              <span class="stat-label">Available Balance</span>
+              <span class="stat-val" id="dossierBalance">$450,000</span>
+            </div>
+            <div class="dossier-stat-box">
+              <span class="stat-label">Risk Rating</span>
+              <span class="stat-val" id="dossierRiskScore">85%</span>
+            </div>
+          </div>
+
+          <div class="risk-bar-track">
+            <div class="risk-bar-fill" id="dossierRiskBar" style="width: 85%;"></div>
+          </div>
+
+          <div class="dossier-info-list">
+            <div class="info-row">
+              <span class="info-lbl">Account Standing</span>
+              <span class="info-val" id="dossierStanding">Under Active Surveillance</span>
+            </div>
+            <div class="info-row">
+              <span class="info-lbl">Compliance Flag</span>
+              <span class="info-val" id="dossierFlag">FLAGGED FOR REVIEW</span>
+            </div>
+          </div>
+
+          <div class="manager-action-group">
+            <label class="group-title">Manager Actions</label>
+            <div class="action-buttons-row">
+              <button id="btnFreezeAccount" class="btn btn-secondary btn-sm danger">Freeze Account</button>
+              <button id="btnCheckLoopsForAccount" class="btn btn-secondary btn-sm">Scan Loops</button>
+            </div>
+          </div>
+
+          <div class="trace-sub-panel">
+            <label class="group-title">Trace Destination From This Account</label>
+            <div class="trace-form-row">
+              <select id="selectTraceTarget" class="input-select"></select>
+              <button id="btnTraceFromAccount" class="btn btn-primary blue btn-sm">Trace</button>
+            </div>
+            <div id="accountTraceResult" class="trace-result-msg hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tabTransfer" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h3 class="section-title">Transfer Authorization Station</h3>
+            <p class="section-desc">Simulate or approve funds movement with real-time compliance screening.</p>
+          </div>
+        </div>
+
+        <form id="formSendMoney" class="transfer-form-modern">
+          <div class="transfer-field">
+            <label>Originating Account (Sender)</label>
+            <select id="selectSendFrom" class="input-select" required></select>
+          </div>
+
+          <div class="transfer-field">
+            <label>Beneficiary Account (Receiver)</label>
+            <select id="selectSendTo" class="input-select" required></select>
+          </div>
+
+          <div class="transfer-field">
+            <label>Transfer Amount (USD)</label>
+            <input type="number" id="inputSendAmount" class="input-text" value="25000" min="1" step="any" required>
+          </div>
+
+          <div class="transfer-risk-preview">
+            <div class="preview-title">Compliance Pre-Screening</div>
+            <div class="preview-badge" id="transferRiskBadge">Automated AML Check Passed</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary green full-width">
+            Authorize &amp; Execute Wire Transfer
+          </button>
+        </form>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/static/js/graph_visualizer.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

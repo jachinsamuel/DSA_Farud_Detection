@@ -1,0 +1,53 @@
+{
+  "accounts": [
+    {"account_id": "ACC-101", "name": "Vanguard Shell Corp", "risk_score": 85.0, "balance": 450000.0, "is_flagged": true},
+    {"account_id": "ACC-102", "name": "Apex Logistics Ltd", "risk_score": 75.0, "balance": 380000.0, "is_flagged": false},
+    {"account_id": "ACC-103", "name": "Horizon Trading Inc", "risk_score": 80.0, "balance": 420000.0, "is_flagged": false},
+    {"account_id": "ACC-104", "name": "Bermuda Holdings", "risk_score": 90.0, "balance": 510000.0, "is_flagged": true},
+
+    {"account_id": "ACC-200", "name": "Central Cartel Hub", "risk_score": 95.0, "balance": 850000.0, "is_flagged": true},
+    {"account_id": "ACC-201", "name": "Smurf Mule Alpha", "risk_score": 60.0, "balance": 9800.0, "is_flagged": false},
+    {"account_id": "ACC-202", "name": "Smurf Mule Beta", "risk_score": 65.0, "balance": 9500.0, "is_flagged": false},
+    {"account_id": "ACC-203", "name": "Smurf Mule Gamma", "risk_score": 58.0, "balance": 9700.0, "is_flagged": false},
+    {"account_id": "ACC-204", "name": "Smurf Mule Delta", "risk_score": 62.0, "balance": 9900.0, "is_flagged": false},
+    {"account_id": "ACC-205", "name": "Smurf Mule Epsilon", "risk_score": 70.0, "balance": 9600.0, "is_flagged": false},
+
+    {"account_id": "ACC-300", "name": "Offshore Funnel Cayman", "risk_score": 92.0, "balance": 1200000.0, "is_flagged": true},
+
+    {"account_id": "ACC-501", "name": "Alice Green", "risk_score": 10.0, "balance": 15400.0, "is_flagged": false},
+    {"account_id": "ACC-502", "name": "Bob Smith", "risk_score": 12.0, "balance": 8200.0, "is_flagged": false},
+    {"account_id": "ACC-503", "name": "Charlie Davis", "risk_score": 15.0, "balance": 23000.0, "is_flagged": false},
+    {"account_id": "ACC-504", "name": "Diana Prince", "risk_score": 8.0, "balance": 45000.0, "is_flagged": false},
+
+    {"account_id": "ACC-901", "name": "Blacklisted Sanctioned Entity", "risk_score": 99.0, "balance": 1500000.0, "is_flagged": true},
+    {"account_id": "ACC-902", "name": "Intermediary Mule 1", "risk_score": 70.0, "balance": 45000.0, "is_flagged": false},
+    {"account_id": "ACC-903", "name": "Intermediary Mule 2", "risk_score": 72.0, "balance": 60000.0, "is_flagged": false},
+    {"account_id": "ACC-999", "name": "Dark Cash-Out Terminal", "risk_score": 98.0, "balance": 2300000.0, "is_flagged": true}
+  ],
+  "transactions": [
+    {"tx_id": "TX-1001", "src": "ACC-101", "dest": "ACC-102", "amount": 95000.0, "timestamp": 1700000100},
+    {"tx_id": "TX-1002", "src": "ACC-102", "dest": "ACC-103", "amount": 94000.0, "timestamp": 1700000200},
+    {"tx_id": "TX-1003", "src": "ACC-103", "dest": "ACC-104", "amount": 93500.0, "timestamp": 1700000300},
+    {"tx_id": "TX-1004", "src": "ACC-104", "dest": "ACC-101", "amount": 92000.0, "timestamp": 1700000400},
+
+    {"tx_id": "TX-2001", "src": "ACC-200", "dest": "ACC-201", "amount": 9800.0, "timestamp": 1700001000},
+    {"tx_id": "TX-2002", "src": "ACC-200", "dest": "ACC-202", "amount": 9500.0, "timestamp": 1700001050},
+    {"tx_id": "TX-2003", "src": "ACC-200", "dest": "ACC-203", "amount": 9700.0, "timestamp": 1700001100},
+    {"tx_id": "TX-2004", "src": "ACC-200", "dest": "ACC-204", "amount": 9900.0, "timestamp": 1700001150},
+    {"tx_id": "TX-2005", "src": "ACC-200", "dest": "ACC-205", "amount": 9600.0, "timestamp": 1700001200},
+
+    {"tx_id": "TX-3001", "src": "ACC-201", "dest": "ACC-300", "amount": 9600.0, "timestamp": 1700002000},
+    {"tx_id": "TX-3002", "src": "ACC-202", "dest": "ACC-300", "amount": 9400.0, "timestamp": 1700002050},
+    {"tx_id": "TX-3003", "src": "ACC-203", "dest": "ACC-300", "amount": 9500.0, "timestamp": 1700002100},
+    {"tx_id": "TX-3004", "src": "ACC-204", "dest": "ACC-300", "amount": 9700.0, "timestamp": 1700002150},
+
+    {"tx_id": "TX-4001", "src": "ACC-901", "dest": "ACC-902", "amount": 250000.0, "timestamp": 1700003000},
+    {"tx_id": "TX-4002", "src": "ACC-902", "dest": "ACC-903", "amount": 245000.0, "timestamp": 1700003100},
+    {"tx_id": "TX-4003", "src": "ACC-903", "dest": "ACC-999", "amount": 240000.0, "timestamp": 1700003200},
+
+    {"tx_id": "TX-5001", "src": "ACC-501", "dest": "ACC-502", "amount": 120.0, "timestamp": 1700004000},
+    {"tx_id": "TX-5002", "src": "ACC-502", "dest": "ACC-503", "amount": 450.0, "timestamp": 1700004100},
+    {"tx_id": "TX-5003", "src": "ACC-503", "dest": "ACC-504", "amount": 80.0, "timestamp": 1700004200},
+    {"tx_id": "TX-5004", "src": "ACC-504", "dest": "ACC-501", "amount": 250.0, "timestamp": 1700004300}
+  ]
+}
