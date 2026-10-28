@@ -2,7 +2,7 @@ class GraphVisualizer {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext('2d');
-    
+
     this.nodes = [];
     this.links = [];
     this.rawNodes = [];
@@ -404,7 +404,7 @@ class GraphVisualizer {
   }
 
   animate() {
-    this.particleOffset = (this.particleOffset + 0.015) % 1.0;
+    this.particleOffset = (this.particleOffset + 0.012) % 1.0;
     this.render();
     requestAnimationFrame(this.animate);
   }
@@ -432,38 +432,63 @@ class GraphVisualizer {
       const isCycleEdge = this.highlightedCycleEdges.has(edgeKey);
       const isPathEdge = this.highlightedPathEdges.has(edgeKey);
 
-      ctx.beginPath();
-      ctx.moveTo(src.x, src.y);
-      ctx.lineTo(dest.x, dest.y);
-
       if (isCycleEdge) {
+        ctx.beginPath();
+        ctx.moveTo(src.x, src.y);
+        ctx.lineTo(dest.x, dest.y);
         ctx.strokeStyle = dark ? '#ff334b' : '#dc2626';
-        ctx.lineWidth = 3.0;
-        ctx.shadowColor = dark ? 'rgba(255, 51, 75, 0.6)' : 'rgba(220, 38, 38, 0.4)';
-        ctx.shadowBlur = 12;
-      } else if (isPathEdge) {
-        ctx.strokeStyle = dark ? '#00e5ff' : '#0284c7';
-        ctx.lineWidth = 3.0;
-        ctx.shadowColor = dark ? 'rgba(0, 229, 255, 0.6)' : 'rgba(2, 132, 199, 0.4)';
-        ctx.shadowBlur = 12;
-      } else {
-        ctx.strokeStyle = dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(100, 116, 139, 0.35)';
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 3.5;
+        ctx.shadowColor = dark ? 'rgba(255, 51, 75, 0.7)' : 'rgba(220, 38, 38, 0.5)';
+        ctx.shadowBlur = 14;
+        ctx.stroke();
         ctx.shadowBlur = 0;
+      } else if (isPathEdge) {
+        ctx.beginPath();
+        ctx.moveTo(src.x, src.y);
+        ctx.lineTo(dest.x, dest.y);
+        ctx.strokeStyle = dark ? '#00e5ff' : '#0284c7';
+        ctx.lineWidth = 3.5;
+        ctx.shadowColor = dark ? 'rgba(0, 229, 255, 0.7)' : 'rgba(2, 132, 199, 0.5)';
+        ctx.shadowBlur = 14;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      } else {
+        const grad = ctx.createLinearGradient(src.x, src.y, dest.x, dest.y);
+        if (dark) {
+          grad.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0.06)');
+        } else {
+          grad.addColorStop(0, 'rgba(100, 116, 139, 0.4)');
+          grad.addColorStop(1, 'rgba(100, 116, 139, 0.2)');
+        }
+        ctx.beginPath();
+        ctx.moveTo(src.x, src.y);
+        ctx.lineTo(dest.x, dest.y);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.5;
+        ctx.shadowBlur = 0;
+        ctx.stroke();
       }
-      ctx.stroke();
-      ctx.shadowBlur = 0;
 
       if (isCycleEdge || isPathEdge) {
-        const pX = src.x + (dest.x - src.x) * this.particleOffset;
-        const pY = src.y + (dest.y - src.y) * this.particleOffset;
-        ctx.beginPath();
-        ctx.arc(pX, pY, 3.5, 0, 2 * Math.PI);
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = isCycleEdge ? (dark ? '#ff334b' : '#dc2626') : (dark ? '#00e5ff' : '#0284c7');
-        ctx.shadowBlur = 8;
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        const baseColor = isCycleEdge ? (dark ? '#ff334b' : '#dc2626') : (dark ? '#00e5ff' : '#0284c7');
+        const offsets = [this.particleOffset, (this.particleOffset - 0.03 + 1) % 1, (this.particleOffset - 0.06 + 1) % 1];
+        const opacities = [1.0, 0.55, 0.2];
+        const sizes = [4, 3, 2];
+
+        for (let pi = offsets.length - 1; pi >= 0; pi--) {
+          const pX = src.x + (dest.x - src.x) * offsets[pi];
+          const pY = src.y + (dest.y - src.y) * offsets[pi];
+          ctx.beginPath();
+          ctx.arc(pX, pY, sizes[pi], 0, 2 * Math.PI);
+          ctx.globalAlpha = opacities[pi];
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = baseColor;
+          ctx.shadowBlur = pi === 0 ? 10 : 0;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.globalAlpha = 1.0;
+        }
       }
 
       this.drawArrowHead(ctx, src.x, src.y, dest.x, dest.y, dest.radius, isCycleEdge ? (dark ? '#ff334b' : '#dc2626') : (isPathEdge ? (dark ? '#00e5ff' : '#0284c7') : (dark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(71, 85, 105, 0.5)')));
@@ -475,26 +500,36 @@ class GraphVisualizer {
         const midX = (src.x + dest.x) / 2;
         const midY = (src.y + dest.y) / 2;
         const labelText = `$${link.amount.toLocaleString()}`;
-        ctx.font = '700 12px "JetBrains Mono", monospace';
+        ctx.font = '600 11px "JetBrains Mono", monospace';
         const textMetrics = ctx.measureText(labelText);
         const textW = textMetrics.width;
 
-        ctx.fillStyle = dark ? 'rgba(15, 23, 42, 0.94)' : 'rgba(255, 255, 255, 0.96)';
-        ctx.strokeStyle = isCycleEdge ? (dark ? '#ff334b' : '#dc2626') : (isPathEdge ? (dark ? '#00e5ff' : '#0284c7') : (dark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.18)'));
-        ctx.lineWidth = (isCycleEdge || isPathEdge || isConnectedToHover) ? 1.5 : 1;
+        const pillW = textW + 16;
+        const pillH = 20;
+        const pillX = midX - pillW / 2;
+        const pillY = midY - pillH / 2 - 2;
+
+        const edgeColor = isCycleEdge ? (dark ? '#ff334b' : '#dc2626') : (isPathEdge ? (dark ? '#00e5ff' : '#0284c7') : (dark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.18)'));
+
+        ctx.fillStyle = dark ? 'rgba(15, 23, 42, 0.92)' : 'rgba(255, 255, 255, 0.94)';
         ctx.beginPath();
         if (ctx.roundRect) {
-          ctx.roundRect(midX - textW / 2 - 6, midY - 14, textW + 12, 18, 4);
+          ctx.roundRect(pillX, pillY, pillW, pillH, 6);
         } else {
-          ctx.rect(midX - textW / 2 - 6, midY - 14, textW + 12, 18);
+          ctx.rect(pillX, pillY, pillW, pillH);
         }
         ctx.fill();
+
+        ctx.strokeStyle = edgeColor;
+        ctx.globalAlpha = 0.5;
+        ctx.lineWidth = 1;
         ctx.stroke();
+        ctx.globalAlpha = 1.0;
 
         ctx.fillStyle = isCycleEdge ? (dark ? '#ff6b81' : '#dc2626') : (isPathEdge ? (dark ? '#38bdf8' : '#0284c7') : (dark ? '#f1f5f9' : '#0f172a'));
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(labelText, midX, midY - 5);
+        ctx.fillText(labelText, midX, pillY + pillH / 2);
         ctx.textBaseline = 'alphabetic';
       }
     }
@@ -503,26 +538,47 @@ class GraphVisualizer {
       const isCycleNode = this.highlightedCycleNodes.has(node.id);
       const isPathNode = this.highlightedPathNodes.has(node.id);
       const isBfsNode = this.highlightedBfsNodes.has(node.id);
+      const isHovered = this.hoveredNode && this.hoveredNode.id === node.id;
+
+      const renderRadius = isHovered ? node.radius + 2 : node.radius;
+
+      let coreColorInner = dark ? '#34d399' : '#34d399';
+      let coreColorOuter = dark ? '#059669' : '#059669';
+      if (node.is_flagged || node.risk_score >= 80) {
+        coreColorInner = '#f87171';
+        coreColorOuter = '#dc2626';
+      } else if (node.risk_score >= 50) {
+        coreColorInner = '#fbbf24';
+        coreColorOuter = '#d97706';
+      }
 
       ctx.beginPath();
-      ctx.arc(node.x, node.y, node.radius + 3, 0, 2 * Math.PI);
+      ctx.arc(node.x, node.y, renderRadius + 5, 0, 2 * Math.PI);
+      ctx.fillStyle = dark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+      ctx.fill();
+
+      if (isHovered) {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, renderRadius + 8, 0, 2 * Math.PI);
+        ctx.fillStyle = dark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)';
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, renderRadius + 3, 0, 2 * Math.PI);
       ctx.fillStyle = dark ? 'rgba(11, 14, 20, 0.85)' : '#ffffff';
       ctx.fill();
       ctx.strokeStyle = dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.12)';
       ctx.lineWidth = 1;
       ctx.stroke();
 
+      const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, renderRadius);
+      gradient.addColorStop(0, coreColorInner);
+      gradient.addColorStop(1, coreColorOuter);
+
       ctx.beginPath();
-      ctx.arc(node.x, node.y, node.radius, 0, 2 * Math.PI);
-
-      let coreColor = dark ? '#10b981' : '#059669';
-      if (node.is_flagged || node.risk_score >= 80) {
-        coreColor = dark ? '#ff334b' : '#dc2626';
-      } else if (node.risk_score >= 50) {
-        coreColor = dark ? '#f59e0b' : '#d97706';
-      }
-
-      ctx.fillStyle = coreColor;
+      ctx.arc(node.x, node.y, renderRadius, 0, 2 * Math.PI);
+      ctx.fillStyle = gradient;
 
       if (isCycleNode) {
         ctx.strokeStyle = '#ffffff';
@@ -549,19 +605,22 @@ class GraphVisualizer {
       ctx.shadowBlur = 0;
 
       ctx.beginPath();
-      ctx.arc(node.x, node.y, 4, 0, 2 * Math.PI);
+      ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI);
       ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+      ctx.shadowBlur = 4;
       ctx.fill();
+      ctx.shadowBlur = 0;
 
-      ctx.font = '700 13px "JetBrains Mono", monospace';
-      ctx.fillStyle = dark ? '#ffffff' : '#0f172a';
+      ctx.font = '700 12px "JetBrains Mono", monospace';
+      ctx.fillStyle = dark ? '#f1f5f9' : '#0f172a';
       ctx.textAlign = 'center';
-      ctx.fillText(node.id, node.x, node.y + node.radius + 16);
+      ctx.fillText(node.id, node.x, node.y + renderRadius + 18);
 
-      ctx.font = '600 11.5px "Plus Jakarta Sans", sans-serif';
+      ctx.font = '500 11px "Plus Jakarta Sans", sans-serif';
       ctx.fillStyle = dark ? '#94a3b8' : '#475569';
       const shortName = node.name.length > 17 ? node.name.slice(0, 15) + '..' : node.name;
-      ctx.fillText(shortName, node.x, node.y + node.radius + 31);
+      ctx.fillText(shortName, node.x, node.y + renderRadius + 33);
     }
 
     if (this.hoveredNode) {
@@ -572,17 +631,17 @@ class GraphVisualizer {
   }
 
   drawGrid(ctx, width, height, dark) {
-    const gridSize = 45;
+    const gridSize = 50;
     const startX = -this.panX / this.scale - gridSize;
     const startY = -this.panY / this.scale - gridSize;
     const endX = startX + width / this.scale + gridSize * 2;
     const endY = startY + height / this.scale + gridSize * 2;
 
     ctx.beginPath();
-    ctx.fillStyle = dark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 23, 42, 0.06)';
+    ctx.fillStyle = dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 23, 42, 0.03)';
     for (let x = startX - (startX % gridSize); x < endX; x += gridSize) {
       for (let y = startY - (startY % gridSize); y < endY; y += gridSize) {
-        ctx.fillRect(x, y, 1.2, 1.2);
+        ctx.fillRect(x, y, 1, 1);
       }
     }
   }
@@ -591,7 +650,7 @@ class GraphVisualizer {
     const angle = Math.atan2(toY - fromY, toX - fromX);
     const arrowX = toX - (targetRadius + 2) * Math.cos(angle);
     const arrowY = toY - (targetRadius + 2) * Math.sin(angle);
-    const headLen = 6.5;
+    const headLen = 8;
 
     ctx.save();
     ctx.beginPath();
@@ -605,32 +664,57 @@ class GraphVisualizer {
   }
 
   drawDossierTooltip(ctx, node, dark) {
-    const boxW = 215;
-    const boxH = 92;
+    const boxW = 230;
+    const boxH = 100;
     const boxX = node.x + node.radius + 12;
     const boxY = node.y - 25;
+
+    let accentColor = dark ? '#10b981' : '#059669';
+    if (node.risk_score >= 80 || node.is_flagged) {
+      accentColor = dark ? '#ff334b' : '#dc2626';
+    } else if (node.risk_score >= 50) {
+      accentColor = dark ? '#f59e0b' : '#d97706';
+    }
+
+    ctx.fillStyle = dark ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(boxX + 4, boxY + 4, boxW, boxH, 10);
+    } else {
+      ctx.rect(boxX + 4, boxY + 4, boxW, boxH);
+    }
+    ctx.fill();
 
     ctx.fillStyle = dark ? 'rgba(11, 14, 20, 0.96)' : 'rgba(255, 255, 255, 0.98)';
     ctx.strokeStyle = dark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)';
     ctx.lineWidth = 1;
-    ctx.fillRect(boxX, boxY, boxW, boxH);
-    ctx.strokeRect(boxX, boxY, boxW, boxH);
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(boxX, boxY, boxW, boxH, 10);
+    } else {
+      ctx.rect(boxX, boxY, boxW, boxH);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = accentColor;
+    ctx.fillRect(boxX + 1, boxY + 1, boxW - 2, 2);
 
     ctx.textAlign = 'left';
     ctx.font = '700 13px "JetBrains Mono", monospace';
     ctx.fillStyle = dark ? '#00e5ff' : '#0284c7';
-    ctx.fillText(node.id, boxX + 12, boxY + 22);
+    ctx.fillText(node.id, boxX + 14, boxY + 24);
 
     ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = dark ? '#e2e8f0' : '#0f172a';
-    ctx.fillText(node.name, boxX + 12, boxY + 41);
+    ctx.fillText(node.name, boxX + 14, boxY + 43);
 
-    ctx.font = '700 11px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '700 12px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = node.risk_score >= 80 ? (dark ? '#ff334b' : '#dc2626') : (node.risk_score >= 50 ? (dark ? '#f59e0b' : '#d97706') : (dark ? '#10b981' : '#059669'));
-    ctx.fillText(`RISK FACTOR: ${node.risk_score}%`, boxX + 12, boxY + 61);
+    ctx.fillText(`RISK FACTOR: ${node.risk_score}%`, boxX + 14, boxY + 63);
 
     ctx.font = '600 11.5px "JetBrains Mono", monospace';
     ctx.fillStyle = dark ? '#94a3b8' : '#475569';
-    ctx.fillText(`BALANCE: $${node.balance.toLocaleString()}`, boxX + 12, boxY + 79);
+    ctx.fillText(`BALANCE: $${node.balance.toLocaleString()}`, boxX + 14, boxY + 83);
   }
 }
