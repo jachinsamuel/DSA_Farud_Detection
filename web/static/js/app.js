@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   bindCategoryTabs();
   bindTabs();
   bindResizer();
-  bindSizeButtons();
   bindControls();
   loadData();
 
@@ -92,49 +91,6 @@ function bindResizer() {
       visualizer.resetView();
     }
   });
-
-  resizer.addEventListener('dblclick', () => {
-    const curWidth = parseInt(window.getComputedStyle(panel).width);
-    if (curWidth > 450) {
-      setPanelSize('normal');
-    } else {
-      setPanelSize('wide');
-    }
-  });
-}
-
-function bindSizeButtons() {
-  const sizeBtns = document.querySelectorAll('.btn-size');
-  sizeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const size = btn.getAttribute('data-size');
-      setPanelSize(size);
-    });
-  });
-}
-
-function setPanelSize(sizeName) {
-  const panel = document.getElementById('controlPanel');
-  if (!panel) return;
-
-  document.querySelectorAll('.btn-size').forEach(b => {
-    b.classList.toggle('active', b.getAttribute('data-size') === sizeName);
-  });
-
-  if (sizeName === 'compact') {
-    panel.style.width = '300px';
-  } else if (sizeName === 'wide') {
-    panel.style.width = '600px';
-  } else {
-    panel.style.width = '420px';
-  }
-
-  setTimeout(() => {
-    if (visualizer) {
-      visualizer.resizeCanvas();
-      visualizer.resetView();
-    }
-  }, 120);
 }
 
 function bindControls() {

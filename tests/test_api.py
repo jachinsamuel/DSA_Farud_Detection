@@ -7,7 +7,7 @@ def test_endpoints():
     client = app.test_client()
     r = client.get('/')
     assert r.status_code == 200, f'Index failed: {r.status_code}'
-    assert b'Fraud Guard' in r.data
+    assert b'Fraud Detection System' in r.data
     print('[OK] Index HTML endpoint OK')
     r = client.get('/api/graph')
     assert r.status_code == 200

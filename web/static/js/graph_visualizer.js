@@ -74,8 +74,9 @@ class GraphVisualizer {
     } else if (categoryKey === 'offshore') {
       const ids = new Set(['ACC-201', 'ACC-202', 'ACC-203', 'ACC-204', 'ACC-300']);
       filteredNodes = this.rawNodes.filter(n => ids.has(n.id));
-    } else if (categoryKey === 'watchlist') {
-      filteredNodes = this.rawNodes.filter(n => n.is_flagged || n.risk_score >= 75);
+    } else if (categoryKey === 'syndicate' || categoryKey === 'watchlist') {
+      const ids = new Set(['ACC-200', 'ACC-201', 'ACC-202', 'ACC-203', 'ACC-204', 'ACC-205', 'ACC-300']);
+      filteredNodes = this.rawNodes.filter(n => ids.has(n.id));
     } else {
       filteredNodes = [...this.rawNodes];
     }
@@ -139,16 +140,97 @@ class GraphVisualizer {
           this.nodeMap.set(node.id, node);
         });
       });
-    } else {
-      const count = this.nodes.length;
-      const radius = Math.min(width, height) * (count <= 5 ? 0.30 : 0.36);
-      this.nodes.forEach((node, idx) => {
-        const angle = (idx / count) * 2 * Math.PI;
+    } else if (categoryKey === 'mules') {
+      const order = ['ACC-901', 'ACC-902', 'ACC-903', 'ACC-999'];
+      const map = new Map(this.nodes.map(n => [n.id, n]));
+      order.forEach((id, idx) => {
+        const node = map.get(id);
+        if (!node) return;
+        node.x = cx - 225 + idx * 150;
+        node.y = cy;
+        node.anchorX = node.x;
+        node.anchorY = node.y;
+        node.radius = 26;
+        this.nodeMap.set(node.id, node);
+      });
+    } else if (categoryKey === 'smurfing') {
+      const hub = this.nodes.find(n => n.id === 'ACC-200');
+      const mules = this.nodes.filter(n => n.id !== 'ACC-200');
+      if (hub) {
+        hub.x = cx;
+        hub.y = cy;
+        hub.anchorX = cx;
+        hub.anchorY = cy;
+        hub.radius = 28;
+        this.nodeMap.set(hub.id, hub);
+      }
+      const radius = 175;
+      mules.forEach((node, idx) => {
+        const angle = (idx / mules.length) * 2 * Math.PI - Math.PI / 2;
         node.x = cx + radius * Math.cos(angle);
         node.y = cy + radius * Math.sin(angle);
-        node.anchorX = cx;
-        node.anchorY = cy;
-        node.radius = count <= 5 ? 26 : 22;
+        node.anchorX = node.x;
+        node.anchorY = node.y;
+        node.radius = 24;
+        this.nodeMap.set(node.id, node);
+      });
+    } else if (categoryKey === 'offshore') {
+      const sink = this.nodes.find(n => n.id === 'ACC-300');
+      const mules = this.nodes.filter(n => n.id !== 'ACC-300');
+      if (sink) {
+        sink.x = cx + 190;
+        sink.y = cy;
+        sink.anchorX = sink.x;
+        sink.anchorY = sink.y;
+        sink.radius = 28;
+        this.nodeMap.set(sink.id, sink);
+      }
+      mules.forEach((node, idx) => {
+        node.x = cx - 180;
+        node.y = cy - 135 + idx * 90;
+        node.anchorX = node.x;
+        node.anchorY = node.y;
+        node.radius = 24;
+        this.nodeMap.set(node.id, node);
+      });
+    } else if (categoryKey === 'syndicate' || categoryKey === 'watchlist') {
+      const hub = this.nodes.find(n => n.id === 'ACC-200');
+      const sink = this.nodes.find(n => n.id === 'ACC-300');
+      const mules = this.nodes.filter(n => n.id !== 'ACC-200' && n.id !== 'ACC-300');
+      if (hub) {
+        hub.x = cx - 250;
+        hub.y = cy;
+        hub.anchorX = hub.x;
+        hub.anchorY = hub.y;
+        hub.radius = 28;
+        this.nodeMap.set(hub.id, hub);
+      }
+      if (sink) {
+        sink.x = cx + 250;
+        sink.y = cy;
+        sink.anchorX = sink.x;
+        sink.anchorY = sink.y;
+        sink.radius = 28;
+        this.nodeMap.set(sink.id, sink);
+      }
+      mules.forEach((node, idx) => {
+        node.x = cx;
+        node.y = cy - 140 + idx * 70;
+        node.anchorX = node.x;
+        node.anchorY = node.y;
+        node.radius = 23;
+        this.nodeMap.set(node.id, node);
+      });
+    } else {
+      const count = this.nodes.length;
+      const radius = 160;
+      this.nodes.forEach((node, idx) => {
+        const angle = (idx / count) * 2 * Math.PI - Math.PI / 2;
+        node.x = cx + radius * Math.cos(angle);
+        node.y = cy + radius * Math.sin(angle);
+        node.anchorX = node.x;
+        node.anchorY = node.y;
+        node.radius = 26;
         this.nodeMap.set(node.id, node);
       });
     }
@@ -201,6 +283,13 @@ class GraphVisualizer {
         if (node !== this.draggedNode && node.anchorX !== undefined) {
           node.x += (node.anchorX - node.x) * 0.045;
           node.y += (node.anchorY - node.y) * 0.045;
+        }
+      }
+    } else {
+      for (const node of this.nodes) {
+        if (node !== this.draggedNode && node.anchorX !== undefined) {
+          node.x += (node.anchorX - node.x) * 0.04;
+          node.y += (node.anchorY - node.y) * 0.04;
         }
       }
     }
